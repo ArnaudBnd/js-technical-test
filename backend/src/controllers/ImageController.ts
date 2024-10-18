@@ -7,7 +7,8 @@ const ImageController = {
       const images = await knex('images').select('*');
       res.status(200).json(images);
     } catch (error) {
-      res.status(500).json({ error: 'Internal Server Error' });
+      console.error('Error getting all images:', error);
+      res.status(500).json({ error: 'An unexpected error occurred' });
     }
   },
 
@@ -21,7 +22,8 @@ const ImageController = {
         res.status(404).json({ error: 'Image not found' });
       }
     } catch (error) {
-      res.status(500).json({ error: 'Internal Server Error' });
+      console.error('Error getting image:', error);
+      res.status(500).json({ error: 'An unexpected error occurred' });
     }
   },
 
@@ -29,9 +31,10 @@ const ImageController = {
     const { name, path } = req.body;
     try {
       const [id] = await knex('images').insert({ name, path });
-      res.status(650).json({ id, name, path });
+      res.status(201).json({ id, name, path });
     } catch (error) {
-      res.status(500).json({ error: 'Internal Server Error' });
+      console.error('Error creating image:', error);
+      res.status(500).json({ error: 'An unexpected error occurred' });
     }
   },
 
@@ -46,7 +49,8 @@ const ImageController = {
         res.status(404).json({ error: 'Image not found' });
       }
     } catch (error) {
-      res.status(500).json({ error: 'Internal Server Error' });
+      console.error('Error updating image:', error);
+      res.status(500).json({ error: 'An unexpected error occurred' });
     }
   },
 
@@ -55,12 +59,13 @@ const ImageController = {
     try {
       const deletedRows = await knex('images').where('id', id).del();
       if (deletedRows > 0) {
-        res.status(200).json({ message: 'Image deleted successfully' });
+        res.status(204).send();
       } else {
         res.status(404).json({ error: 'Image not found' });
       }
     } catch (error) {
-      res.status(500).json({ error: 'Internal Server Error' });
+      console.error('Error deleting image:', error);
+      res.status(500).json({ error: 'An unexpected error occurred' });
     }
   },
 };
