@@ -1,10 +1,10 @@
 import { Request, Response } from 'express';
-import ImageRepository from '../repositories/ImageRepository';
+import ImageService from '../services/ImageService';
 
 const ImageController = {
   getAll: async (req: Request, res: Response): Promise<void> => {
     try {
-      const images = await ImageRepository.getAll();
+      const images = await ImageService.getAllImages();
       res.status(200).json(images);
     } catch (error) {
       console.error('Error getting all images:', error);
@@ -15,7 +15,7 @@ const ImageController = {
   getById: async (req: Request, res: Response): Promise<void> => {
     const { id } = req.params;
     try {
-      const image = await ImageRepository.getById(Number(id));
+      const image = await ImageService.getImageById(Number(id));
       if (image) {
         res.status(200).json(image);
       } else {
@@ -30,7 +30,7 @@ const ImageController = {
   create: async (req: Request, res: Response): Promise<void> => {
     const { name, path } = req.body;
     try {
-      const id = await ImageRepository.create(name, path);
+      const id = await ImageService.createImage(name, path);
       res.status(201).json({ id, name, path });
     } catch (error) {
       console.error('Error creating image:', error);
@@ -42,7 +42,7 @@ const ImageController = {
     const { id } = req.params;
     const { name, path } = req.body;
     try {
-      const success = await ImageRepository.update(Number(id), name, path);
+      const success = await ImageService.updateImage(Number(id), name, path);
       if (success) {
         res.status(200).json({ message: 'Image updated successfully' });
       } else {
@@ -57,7 +57,7 @@ const ImageController = {
   delete: async (req: Request, res: Response): Promise<void> => {
     const { id } = req.params;
     try {
-      const success = await ImageRepository.delete(Number(id));
+      const success = await ImageService.deleteImage(Number(id));
       if (success) {
         res.status(204).send();
       } else {
