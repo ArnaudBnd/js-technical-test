@@ -1,40 +1,11 @@
 import { Request, Response } from 'express';
-import Astronaut from '../entities/Astronaut';
-import Planet from '../entities/Planet';
-import knex from '../db';
+import AstronautRepository from '../repositories/AstronautRepository';
 
 const AstronautController = {
   getAll: async (req: Request, res: Response): Promise<void> => {
     try {
-      const astronauts = await knex('astronauts')
-        .join('planets', 'astronauts.originPlanetId', 'planets.id')
-        .leftJoin('images', 'planets.imageId', 'images.id')
-        .select(
-          'astronauts.id',
-          'astronauts.firstname',
-          'astronauts.lastname',
-          'planets.name as planetName',
-          'planets.description as planetDescription',
-          'planets.isHabitable as planetIsHabitable',
-          'images.path as imagePath',
-          'images.name as imageName'
-        );
-
-      const formattedAstronauts: Astronaut[] = astronauts.map((astronaut) => ({
-        id: astronaut.id,
-        firstname: astronaut.firstname,
-        lastname: astronaut.lastname,
-        originPlanet: {
-          name: astronaut.planetName,
-          isHabitable: astronaut.planetIsHabitable,
-          description: astronaut.planetDescription,
-          image: {
-            path: astronaut.imagePath,
-            name: astronaut.imageName,
-          },
-        } as Planet,
-      }));
-      res.status(200).json(formattedAstronauts);
+      const astronauts = await AstronautRepository.getAll();
+      res.status(200).json(astronauts);
     } catch (error) {
       console.error('Error fetching astronauts:', error);
       res.status(500).json({ error: 'Internal Server Error' });
@@ -44,38 +15,9 @@ const AstronautController = {
   getById: async (req: Request, res: Response): Promise<void> => {
     const { id } = req.params;
     try {
-      const data = await knex('astronauts')
-        .join('planets', 'astronauts.originPlanetId', 'planets.id')
-        .leftJoin('images', 'planets.imageId', 'images.id')
-        .select(
-          'astronauts.id',
-          'astronauts.firstname',
-          'astronauts.lastname',
-          'planets.name as planetName',
-          'planets.description as planetDescription',
-          'planets.isHabitable as planetIsHabitable',
-          'images.path as imagePath',
-          'images.name as imageName'
-        )
-        .where('astronauts.id', id)
-        .first();
-
-        if (data) {
-          const astronaut: Astronaut = {
-            id: data.id,
-            firstname: data.firstname,
-            lastname: data.lastname,
-            originPlanet: {
-              name: data.planetName,
-              isHabitable: data.planetIsHabitable,
-              description: data.planetDescription,
-              image: {
-                path: data.imagePath,
-                name: data.imageName,
-              },
-            } as Planet,
-          };
-          res.status(200).json(astronaut);
+      const astronaut = await AstronautRepository.getById(Number(id));
+      if (astronaut) {
+        res.status(200).json(astronaut);
       } else {
         res.status(404).json({ error: 'Astronaut not found' });
       }
@@ -88,7 +30,7 @@ const AstronautController = {
   create: async (req: Request, res: Response): Promise<void> => {
     const { firstname, lastname, originPlanetId } = req.body;
     try {
-      const [id] = await knex.insert({ firstname, lastname, originPlanetId }).into('astronauts');
+      const id = await AstronautRepository.create(firstname, lastname, originPlanetId);
       res.status(201).json({
         id, firstname, lastname, originPlanetId,
       });
@@ -98,12 +40,13 @@ const AstronautController = {
     }
   },
 
+
   update: async (req: Request, res: Response): Promise<void> => {
     const { id } = req.params;
     const { firstname, lastname, originPlanetId } = req.body;
     try {
-      const updatedRows = await knex('astronauts').where('id', id).update({ firstname, lastname, originPlanetId });
-      if (updatedRows > 0) {
+      const success = await AstronautRepository.update(Number(id), firstname, lastname, originPlanetId);
+      if (success) {
         res.status(200).json({ message: 'Astronaut updated successfully' });
       } else {
         res.status(404).json({ error: 'Astronaut not found' });
@@ -117,8 +60,8 @@ const AstronautController = {
   delete: async (req: Request, res: Response): Promise<void> => {
     const { id } = req.params;
     try {
-      const deletedRows = await knex('astronauts').where('id', id).del();
-      if (deletedRows > 0) {
+      const success = await AstronautRepository.delete(Number(id));
+      if (success) {
         res.status(204).send();
       } else {
         res.status(404).json({ error: 'Astronaut not found' });
