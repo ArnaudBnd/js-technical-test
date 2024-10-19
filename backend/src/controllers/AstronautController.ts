@@ -1,10 +1,10 @@
 import { Request, Response } from 'express';
-import AstronautRepository from '../repositories/AstronautRepository';
+import AstronautService from '../services/AstronautService';
 
 const AstronautController = {
   getAll: async (req: Request, res: Response): Promise<void> => {
     try {
-      const astronauts = await AstronautRepository.getAll();
+      const astronauts = await AstronautService.getAllAstronauts();
       res.status(200).json(astronauts);
     } catch (error) {
       console.error('Error fetching astronauts:', error);
@@ -15,7 +15,7 @@ const AstronautController = {
   getById: async (req: Request, res: Response): Promise<void> => {
     const { id } = req.params;
     try {
-      const astronaut = await AstronautRepository.getById(Number(id));
+      const astronaut = await AstronautService.getAstronautById(Number(id));
       if (astronaut) {
         res.status(200).json(astronaut);
       } else {
@@ -30,7 +30,7 @@ const AstronautController = {
   create: async (req: Request, res: Response): Promise<void> => {
     const { firstname, lastname, originPlanetId } = req.body;
     try {
-      const id = await AstronautRepository.create(firstname, lastname, originPlanetId);
+      const id = await AstronautService.createAstronaut(firstname, lastname, originPlanetId);
       res.status(201).json({
         id, firstname, lastname, originPlanetId,
       });
@@ -40,12 +40,11 @@ const AstronautController = {
     }
   },
 
-
   update: async (req: Request, res: Response): Promise<void> => {
     const { id } = req.params;
     const { firstname, lastname, originPlanetId } = req.body;
     try {
-      const success = await AstronautRepository.update(Number(id), firstname, lastname, originPlanetId);
+      const success = await AstronautService.updateAstronaut(Number(id), firstname, lastname, originPlanetId);
       if (success) {
         res.status(200).json({ message: 'Astronaut updated successfully' });
       } else {
@@ -60,7 +59,7 @@ const AstronautController = {
   delete: async (req: Request, res: Response): Promise<void> => {
     const { id } = req.params;
     try {
-      const success = await AstronautRepository.delete(Number(id));
+      const success = await AstronautService.deleteAstronaut(Number(id));
       if (success) {
         res.status(204).send();
       } else {
