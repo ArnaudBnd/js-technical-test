@@ -1,25 +1,35 @@
 import { Request, Response } from 'express';
 import knex from '../db';
+import Planet from '../entities/Planet';
 
 const PlanetController = {
   getAll: async (req: Request, res: Response): Promise<void> => {
     try {
-      const planets = (await knex('planets')
-      .select('planets.*', 'images.path', 'images.name as imageName')
-      .join('images', 'images.id' , '=' ,'planets.imageId')
-      .where((queryBuilder) => {
-      }))
-      .map(({id, name, isHabitable, description, path, imageName}) => ({
-        id,
-        name,
-        isHabitable,
-        description,
+      const planets = await knex('planets')
+        .leftJoin('images', 'planets.imageId', 'images.id') 
+        .select(
+          'planets.id',
+          'planets.name',
+          'planets.description',
+          'planets.isHabitable',
+          'images.id as imageId',
+          'images.path as imagePath',
+          'images.name as imageName'
+        );
+
+      const formattedPlanets: Planet[] = planets.map((planet) => ({
+        id: planet.id,
+        name: planet.name,
+        description: planet.description,
+        isHabitable: planet.isHabitable,
         image: {
-          path,
-          name: imageName,
+          id: planet.imageId,
+          path: planet.imagePath,
+          name: planet.imageName,
         },
       }));
-      res.status(200).json(planets);
+
+      res.status(200).json(formattedPlanets);
     } catch (error) {
       console.error('Error fetching planets:', error);
       res.status(500).json({ error: 'Internal Server Error' });
@@ -29,18 +39,34 @@ const PlanetController = {
   getById: async (req: Request, res: Response): Promise<void> => {
     const { id } = req.params;
     try {
-      const data = await knex('planets').where('id', id).first();
+      const data = await knex('planets')
+        .leftJoin('images', 'planets.imageId', 'images.id')
+        .select(
+          'planets.id',
+          'planets.name',
+          'planets.description',
+          'planets.isHabitable',
+          'images.id as imageId',
+          'images.path as imagePath',
+          'images.name as imageName'
+        )
+        .where('planets.id', id)
+        .first();
+
       if (data) {
-        res.status(200).json({
+        const planet: Planet = {
           id: data.id,
           name: data.name,
-          isHabitable: data.isHabitable,
           description: data.description,
+          isHabitable: data.isHabitable,
           image: {
-            path: data.path,
+            id: data.imageId,
+            path: data.imagePath,
             name: data.imageName,
           },
-        });
+        };
+
+        res.status(200).json(planet);
       } else {
         res.status(404).json({ error: 'Planet not found' });
       }
