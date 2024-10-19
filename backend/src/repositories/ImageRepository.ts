@@ -13,7 +13,7 @@ class ImageRepository {
   }
 
   async create(name: string, path: string): Promise<number> {
-    const [id] = await knex('images').insert({ name, path }).returning('id');
+    const [id] = await knex('images').insert({ name, path });
     return id;
   }
 
