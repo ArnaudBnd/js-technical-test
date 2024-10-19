@@ -79,7 +79,7 @@ class AstronautRepository {
   }
 
   async create(firstname: string, lastname: string, originPlanetId: number): Promise<number> {
-    const [id] = await knex('astronauts').insert({ firstname, lastname, originPlanetId }).returning('id');
+    const [id] = await knex('astronauts').insert({ firstname, lastname, originPlanetId });
     return id;
   }
 
