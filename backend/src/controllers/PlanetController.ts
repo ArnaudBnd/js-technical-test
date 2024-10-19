@@ -5,7 +5,9 @@ import Planet from '../entities/Planet';
 const PlanetController = {
   getAll: async (req: Request, res: Response): Promise<void> => {
     try {
-      const planets = await knex('planets')
+      const { filterName } = req.query;
+ 
+      const planetsQuery = knex('planets')
         .leftJoin('images', 'planets.imageId', 'images.id') 
         .select(
           'planets.id',
@@ -16,6 +18,10 @@ const PlanetController = {
           'images.path as imagePath',
           'images.name as imageName'
         );
+
+      if(filterName) planetsQuery.where('planets.name', 'like', `%${filterName}%`);
+
+     const planets = await planetsQuery;
 
       const formattedPlanets: Planet[] = planets.map((planet) => ({
         id: planet.id,
