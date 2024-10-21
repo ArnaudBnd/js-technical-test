@@ -1,3 +1,6 @@
+// React
+import { useCallback } from 'react';
+
 // Libs
 import { useNavigate, useParams } from 'react-router-dom';
 
@@ -51,9 +54,14 @@ export function CreateOrEditAstronaut() {
     mode === 'create' ? handleAstronautFormCreate : handleAstronautFormEdit;
 
   const { currentPlanet } = useCurrentPlanet();
-  const { isLoading, data } = useFetch<Astronaut>((options?: RequestInit) =>
-    getOneAstronautFromAPI(astronautId, options),
+
+  const fetchAstronautData = useCallback(
+    (options?: RequestInit) => getOneAstronautFromAPI(astronautId, options),
+    [astronautId]
   );
+  
+  const { isLoading, data } = useFetch<Astronaut>(fetchAstronautData);
+  
 
   return (
     <Flexbox flexDirection="column" className={styles.createoreditastronaut}>

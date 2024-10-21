@@ -29,16 +29,17 @@ export function deleteAstronautAPICall(astronautId: number) {
   });
 }
 
-export async function getOneAstronautFromAPI<Astronaut>(
+export async function getOneAstronautFromAPI(
   astronautId?: string,
-  options?: RequestInit,
+  options?: RequestInit
 ): Promise<Astronaut | undefined> {
   if (!astronautId) {
-    return;
+    return undefined;
   }
 
   return fetchApi<Astronaut>(`/astronauts/${astronautId}`, options);
 }
+
 
 export type CreateUpdateAstronautRequestBody = Pick<
 Astronaut,
