@@ -62,3 +62,51 @@ backend server built with Node.js, and a frontend server.
 
    This command will build and start the services defined in the `docker-compose.yml` file. The backend server will wait
    for the MySQL database to be ready before running migrations and seeds.
+
+4. **Install dependencies and run the frontend and backend services manually:**
+
+   - **Build and run the Docker containers for the database only:**
+
+   ```sh
+   docker-compose up -d db-eleven-test
+   ```
+
+   - **Frontend Setup:**
+   
+     Navigate to the `frontend` directory:
+   
+     ```sh
+     cd frontend
+     ```
+   
+     Install the dependencies:
+   
+     ```sh
+     npm install
+     ```
+   
+     Start the development server:
+   
+     ```sh
+     npm run dev
+     ```
+
+   - **Backend Setup:**
+   
+     Navigate to the `backend` directory:
+   
+     ```sh
+     cd ../backend
+     ```
+   
+     Install the dependencies:
+   
+     ```sh
+     npm install
+     ```
+   
+     Start the development server:
+   
+     ```sh
+     npm run dev
+     ```
