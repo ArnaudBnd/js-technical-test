@@ -1,12 +1,13 @@
 # Use the official Node.js image
 FROM node:18.18.0
 
-# Set the working directory inside the container
 WORKDIR /app
 
-COPY . .
+COPY package*.json ./
 
 RUN npm install
+
+COPY . .
 
 # Command to run the app
 CMD ["npm", "run", "dev"]

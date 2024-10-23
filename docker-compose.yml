@@ -45,7 +45,8 @@ services:
       DB_PASSWORD: eleven11
       DB_NAME: eleven
     volumes:
-      - ./backend:/code/
+    - ./backend/:/app/
+    - /app/node_modules
 
   front-eleven-test:
     restart: always
@@ -53,6 +54,7 @@ services:
       context: ./frontend
       dockerfile: Dockerfile
     volumes:
-      - ./frontend/:/code/
+      - ./frontend/:/app/
+      - /app/node_modules
     ports:
       - "3000:3000"
